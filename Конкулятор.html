@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Калькулятор звёзд</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        font-family: Inter, Arial, sans-serif;
+
+        background:
+            radial-gradient(circle at top left, #243b55, transparent 45%),
+            radial-gradient(circle at bottom right, #141e30, transparent 45%),
+            #0b0f17;
+
+        color: white;
+    }
+
+    .calculator {
+        width: 390px;
+        max-width: calc(100% - 30px);
+
+        padding: 28px;
+
+        border-radius: 28px;
+
+        background: rgba(255, 255, 255, 0.08);
+
+        border: 1px solid rgba(255, 255, 255, 0.12);
+
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+
+        box-shadow:
+            0 25px 70px rgba(0, 0, 0, 0.45),
+            inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .icon {
+        width: 58px;
+        height: 58px;
+
+        margin: 0 auto 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 18px;
+
+        font-size: 29px;
+
+        background: linear-gradient(
+            135deg,
+            #ffd86b,
+            #ffb300
+        );
+
+        box-shadow:
+            0 10px 30px rgba(255, 179, 0, 0.25);
+    }
+
+    h1 {
+        margin: 0;
+
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        margin-top: 7px;
+
+        color: rgba(255, 255, 255, 0.55);
+
+        font-size: 14px;
+    }
+
+    .input-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: rgba(255, 255, 255, 0.65);
+
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    input {
+        width: 100%;
+
+        padding: 17px 55px 17px 18px;
+
+        border: 1px solid rgba(255, 255, 255, 0.12);
+
+        border-radius: 15px;
+
+        outline: none;
+
+        background: rgba(0, 0, 0, 0.22);
+
+        color: white;
+
+        font-size: 22px;
+        font-weight: 600;
+
+        transition: 0.2s;
+    }
+
+    input:focus {
+        border-color: rgba(255, 194, 61, 0.7);
+
+        box-shadow:
+            0 0 0 3px rgba(255, 194, 61, 0.1);
+    }
+
+    input::-webkit-inner-spin-button,
+    input::-webkit-outer-spin-button {
+        opacity: 0;
+    }
+
+    .star-symbol {
+        position: absolute;
+
+        right: 18px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        font-size: 23px;
+    }
+
+    .result-box {
+        margin-top: 20px;
+
+        padding: 22px;
+
+        border-radius: 18px;
+
+        background: rgba(255, 255, 255, 0.06);
+
+        border: 1px solid rgba(255, 255, 255, 0.08);
+
+        text-align: center;
+    }
+
+    .result-label {
+        color: rgba(255, 255, 255, 0.5);
+
+        font-size: 13px;
+
+        margin-bottom: 7px;
+    }
+
+    .result {
+        font-size: 36px;
+        font-weight: 800;
+
+        letter-spacing: -1px;
+
+        color: #ffd15c;
+    }
+
+    .result small {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .result-usd {
+        margin-top: 7px;
+
+        font-size: 21px;
+        font-weight: 600;
+
+        color: rgba(255, 255, 255, 0.65);
+    }
+
+    .buttons {
+        display: flex;
+
+        gap: 10px;
+
+        margin-top: 15px;
+    }
+
+    button {
+        flex: 1;
+
+        padding: 14px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        cursor: pointer;
+
+        font-size: 15px;
+        font-weight: 600;
+
+        transition:
+            transform 0.15s,
+            opacity 0.15s;
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+    }
+
+    button:active {
+        transform: scale(0.98);
+    }
+
+    .calculate {
+        background: linear-gradient(
+            135deg,
+            #ffd86b,
+            #ffb300
+        );
+
+        color: #17120a;
+
+        box-shadow:
+            0 8px 25px rgba(255, 179, 0, 0.2);
+    }
+
+    .clear {
+        background: rgba(255, 255, 255, 0.08);
+
+        color: rgba(255, 255, 255, 0.75);
+
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .prices {
+        margin-top: 22px;
+
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 7px;
+    }
+
+    .price-item {
+        padding: 9px 5px;
+
+        text-align: center;
+
+        border-radius: 10px;
+
+        background: rgba(255, 255, 255, 0.045);
+
+        color: rgba(255, 255, 255, 0.55);
+
+        font-size: 11px;
+    }
+
+    .price-item strong {
+        display: block;
+
+        margin-top: 3px;
+
+        color: rgba(255, 255, 255, 0.85);
+
+        font-size: 12px;
+    }
+
+    .error {
+        color: #ff7777 !important;
+
+        font-size: 17px !important;
+    }
+
+    @media (max-width: 450px) {
+
+        .calculator {
+            padding: 22px;
+
+            border-radius: 24px;
+        }
+
+        .prices {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <div class="header">
+
+        <div class="icon">
+            ⭐️
+        </div>
+
+        <h1>Калькулятор звёзд</h1>
+
+        <div class="subtitle">
+            Рассчитайте стоимость покупки
+        </div>
+
+    </div>
+
+
+    <label class="input-label">
+        Количество звёзд
+    </label>
+
+
+    <div class="input-wrapper">
+
+        <input
+            id="stars"
+            type="number"
+            min="50"
+            max="10000"
+            step="1"
+            value="100"
+            placeholder="Введите количество"
+            oninput="calculate()"
+            onkeydown="if(event.key === 'Enter') calculate()"
+        >
+
+        <span class="star-symbol">
+            ⭐️
+        </span>
+
+    </div>
+
+
+    <div class="result-box">
+
+        <div class="result-label">
+            Стоимость
+        </div>
+
+
+        <div id="result" class="result">
+            36 <small>₽</small>
+        </div>
+
+
+        <div id="resultUSD" class="result-usd">
+            $2.20
+        </div>
+
+    </div>
+
+
+    <div class="buttons">
+
+        <button
+            class="calculate"
+            onclick="calculate()"
+        >
+            Рассчитать
+        </button>
+
+
+        <button
+            class="clear"
+            onclick="clearCalculator()"
+        >
+            Очистить
+        </button>
+
+    </div>
+
+
+    <div class="prices">
+
+        <div class="price-item">
+            50 ⭐️
+            <strong>18 ₽ / $1.10</strong>
+        </div>
+
+        <div class="price-item">
+            250 ⭐️
+            <strong>90 ₽ / $5.50</strong>
+        </div>
+
+        <div class="price-item">
+            500 ⭐️
+            <strong>175 ₽ / $10.70</strong>
+        </div>
+
+        <div class="price-item">
+            1000 ⭐️
+            <strong>340 ₽ / $20.80</strong>
+        </div>
+
+        <div class="price-item">
+            3000 ⭐️
+            <strong>980 ₽ / $59.94</strong>
+        </div>
+
+        <div class="price-item">
+            5000 ⭐️
+            <strong>1600 ₽ / $97.86</strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const RUB_TO_USD = 16.35;
+
+
+function calculate() {
+
+    const input = document.getElementById('stars');
+
+    const result = document.getElementById('result');
+
+    const resultUSD = document.getElementById('resultUSD');
+
+    const stars = Number(input.value);
+
+
+    // Проверяем лимиты
+
+    if (!Number.isInteger(stars) || stars < 50 || stars > 10000) {
+
+        result.classList.add('error');
+
+        if (stars > 10000) {
+
+            result.innerHTML =
+                'Максимум 10 000 ⭐️';
+
+        } else {
+
+            result.innerHTML =
+                'Минимум 50 ⭐️';
+
+        }
+
+        resultUSD.innerHTML = '—';
+
+        return;
+    }
+
+
+    result.classList.remove('error');
+
+
+    let price;
+
+
+    /*
+        ТАРИФЫ:
+
+        50–250 ⭐️
+        0.36 ₽ за ⭐️
+
+        251–500 ⭐️
+        0.34 ₽ за ⭐️
+
+        501–1000 ⭐️
+        0.33 ₽ за ⭐️
+
+        1001–3000 ⭐️
+        0.32 ₽ за ⭐️
+
+        3001–5000 ⭐️
+        0.31 ₽ за ⭐️
+
+        5001–10000 ⭐️
+        0.30 ₽ за ⭐️
+    */
+
+
+    // 50–250
+
+    if (stars <= 250) {
+
+        price =
+            stars * 0.36;
+
+    }
+
+
+    // 251–500
+
+    else if (stars <= 500) {
+
+        price =
+            250 * 0.36 +
+            (stars - 250) * 0.34;
+
+    }
+
+
+    // 501–1000
+
+    else if (stars <= 1000) {
+
+        price =
+            250 * 0.36 +
+            250 * 0.34 +
+            (stars - 500) * 0.33;
+
+    }
+
+
+    // 1001–3000
+
+    else if (stars <= 3000) {
+
+        price =
+            250 * 0.36 +
+            250 * 0.34 +
+            500 * 0.33 +
+            (stars - 1000) * 0.32;
+
+    }
+
+
+    // 3001–5000
+
+    else if (stars <= 5000) {
+
+        price =
+            250 * 0.36 +
+            250 * 0.34 +
+            500 * 0.33 +
+            2000 * 0.32 +
+            (stars - 3000) * 0.31;
+
+    }
+
+
+    // 5001–10000
+
+    else {
+
+        price =
+            250 * 0.36 +
+            250 * 0.34 +
+            500 * 0.33 +
+            2000 * 0.32 +
+            2000 * 0.31 +
+            (stars - 5000) * 0.30;
+
+    }
+
+
+    // Перевод рублей в доллары
+
+    const dollars =
+        price / RUB_TO_USD;
+
+
+    // Вывод рублей
+
+    result.innerHTML =
+        `${price.toFixed(2)} <small>₽</small>`;
+
+
+    // Вывод долларов
+
+    resultUSD.innerHTML =
+        `$${dollars.toFixed(2)}`;
+}
+
+
+function clearCalculator() {
+
+    const input =
+        document.getElementById('stars');
+
+    const result =
+        document.getElementById('result');
+
+    const resultUSD =
+        document.getElementById('resultUSD');
+
+
+    input.value = '';
+
+    result.classList.remove('error');
+
+    result.innerHTML = '—';
+
+    resultUSD.innerHTML = '—';
+}
+
+
+// Первоначальный расчёт
+
+calculate();
+
+</script>
+
+</body>
+</html>
